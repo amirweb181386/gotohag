@@ -1,6 +1,16 @@
 """
 ربات تلگرامی جرعت یا حقیقت پارتنری (نسخه لابی گروهی داینامیک + محدودیت یک بازی همزمان)
 """
+import os
+
+# این کد خودکار فایل کانفیگ را روی سرور ریل‌وی می‌سازد
+with open("config.py", "w", encoding="utf-8") as f:
+    f.write('BOT_TOKEN = "8619031821:AAFhJQqzBZs-A0I8R5Kf6f2VySn0l81fQGk"\n')
+    f.write('BOT_USERNAME = "Gotohag_bot"\n')
+    f.write('DB_PATH = "bot.db"\n')
+
+# --------------------------------------------------
+# بقیه کدهای قبلی خودت از اینجا به بعد شروع می‌شوند:
 
 import json
 import logging
