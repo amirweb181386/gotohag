@@ -439,57 +439,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-db.force_reset_user_status(ADMIN_ID)
-import logging
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-import database as db
-from config import TOKEN, ADMIN_ID
-
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-
-# دکمه‌های پنل بازیکن (شامل دکمه نجات اضطراری)
-PLAYER_KEYBOARD = [['جرعت 🔴', 'حقیقت 🔵'], ['🚪 بستن تمام اتاق‌ها (ریست)']]
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """شروع بازی و فرستادن منوی اصلی"""
-    # ذخیره آیدی پیام منو در حافظه ربات برای حذف کردن در آینده
-    msg = await update.message.reply_text(
-        "به ربات جرعت یا حقیقت خوش آمدی کاکو! یکی از گزینه‌ها را انتخاب کن:",
-        reply_markup=ReplyKeyboardMarkup(PLAYER_KEYBOARD, resize_keyboard=True)
-    )
-    context.user_data['menu_msg_id'] = msg.message_id
-
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    text = update.message.text
-
-    # ۱. هندل دکمه اضطراری بستن اتاق‌ها
-    if text == '🚪 بستن تمام اتاق‌ها (ریست)':
-        db.close_all_user_rooms(user_id)
-        
-        # حذف پیام منوی قبلی برای خلوت شدن چت
-        if 'menu_msg_id' in context.user_data:
-            try:
-                await context.bot.delete_message(chat_id=user_id, message_id=context.user_data['menu_msg_id'])
-            except:
-                pass
-                
-        msg = await update.message.reply_text(
-            "🔓 تمام اتاق‌های شما بسته شد و وضعیت شما ریست گردید!\nاکنون می‌توانید مجدد بازی را شروع کنید.",
-            reply_markup=ReplyKeyboardMarkup(PLAYER_KEYBOARD, resize_keyboard=True)
-        )
-        context.user_data['menu_msg_id'] = msg.message_id
-        return
-
-    # ۲. منطق دکمه‌های بازی و فرستادن منوی جدید به عنوان آخرین پیام
-    if text in ['حقیقت 🔵', 'جرعت 🔴']:
-        # حذف منوی قبلی برای اینکه منوی جدید همیشه پایین‌ترین پیام باشد
-        if 'menu_msg_id' in context.user_data:
-            try:
-                await context.bot.delete_message(chat_id=user_id, message_id=context.user_data['menu_msg_id'])
-            except:
-                pass
 
         if text == 'حقیقت 🔵':
             q = db.get_random_question("حقیقت", "تفریحی", "مشترک")
