@@ -1,8 +1,4 @@
-"""
-لایه دیتابیس ربات جرعت‌حقیقت (نسخه لابی گروهی + تفکیک جنسیت سوالات)
-"""
-
-خimport json
+import json
 import random
 import sqlite3
 from contextlib import contextmanager
@@ -215,16 +211,3 @@ def update_suggestion_status(suggestion_id: int, status: str):
 def get_suggestion_by_id(suggestion_id: int):
     with get_conn() as conn:
         return conn.execute("SELECT * FROM user_suggestions WHERE id = ?", (suggestion_id,)).fetchone()
-def close_all_user_rooms(user_id):
-    """بستن تمام اتاق‌های فعال کاربر و آزاد کردن وضعیت او در دیتابیس"""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    # آزاد کردن وضعیت خود کاربر
-    cursor.execute("UPDATE users SET status = 'free', current_room_id = NULL WHERE user_id = ?", (user_id,))
-    
-    # بستن اتاق‌هایی که این کاربر در آن‌ها حضور داشته است
-    cursor.execute("UPDATE rooms SET status = 'closed' WHERE (user1_id = ? OR user2_id = ?) AND status = 'active'", (user_id, user_id))
-    
-    conn.commit()
-    conn.close()
